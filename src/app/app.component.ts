@@ -1,10 +1,26 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { CartService } from './cart.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
-  title = 'rxjs-demo';
+  cart$ = this.cartService.getCart();
+
+  constructor(private cartService: CartService) {}
+
+  deleteItem(productId: number) {
+    return this.cartService.removeItem(productId);
+  }
+
+  addItem(product: any) {
+    return this.cartService.addItem(product);
+  }
+
+  // fixme:
+  updateItem(qty: number, productId: number) {
+    this.cartService.updateItem(qty, productId);
+  }
 }
