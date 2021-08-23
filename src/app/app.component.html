@@ -34,14 +34,13 @@
 <h1>Carrito de compras con RXJS</h1>
 <ng-container *ngIf="cart$ | async as cart">
   <div class="carrito">
-    <ul *ngFor="let item of cart">
-      <li>
+    <ul>
+      <li *ngFor="let item of cart; let i = index" [attr.data-index]="i">
         {{ item.productName }} –
         <input
           #qty
           min="1"
           max="100"
-          class=""
           type="number"
           [value]="item.productQty"
           (change)="updateItem(+qty.value, item.productId)"
