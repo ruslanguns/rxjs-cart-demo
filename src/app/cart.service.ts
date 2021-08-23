@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { distinctUntilChanged, find, map } from 'rxjs/operators';
 
 interface ICart {
   productId: number;
@@ -21,28 +21,24 @@ const initialState: ICart[] = [
 @Injectable()
 export class CartService {
   private subject = new BehaviorSubject<ICart[]>(initialState);
-  private store$ = this.subject.asObservable();
+  private store$ = this.subject.asObservable().pipe(distinctUntilChanged());
 
   getCart() {
     return this.store$;
   }
 
   addItem(item: ICart) {
-    const product = this.subject.value.find(
+    const products = this.subject.value;
+    const productIndex = products.findIndex(
       (x) => x.productId === item.productId
     );
-    if (product) {
-      this.removeItem(product.productId);
-      this.subject.next([
-        ...this.subject.value,
-        {
-          ...product,
-          productQty: (product.productQty || 0) + 1,
-        },
-      ]);
+
+    if (productIndex !== -1) {
+      products[productIndex].productQty++;
+      this.subject.next(products);
       return;
     }
-    this.subject.next([...this.subject.value, { ...item, productQty: 1 }]);
+    this.subject.next([...products, { ...item, productQty: 1 }]);
   }
 
   removeItem(productId: number) {
@@ -53,19 +49,12 @@ export class CartService {
   }
 
   updateItem(qty: number, productId: number) {
-    const product = this.subject.value.find((x) => x.productId === productId);
+    const products = this.subject.value;
+    const productIndex = products.findIndex((x) => x.productId === productId);
 
-    if (product) {
-      this.removeItem(product.productId);
-      this.subject.next([
-        ...this.subject.value,
-        {
-          ...product,
-          productQty: qty,
-        },
-      ]);
-
-      return;
+    if (productIndex !== -1) {
+      products[productIndex].productQty = qty;
     }
+    return;
   }
 }
