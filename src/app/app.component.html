@@ -32,11 +32,11 @@
 </div>
 
 <h1>Carrito de compras con RXJS</h1>
-<ng-container *ngIf="cart$ | async as cart">
+<ng-container *ngIf="cart$ | async as cart; else loading">
   <div class="carrito">
     <ul>
       <li *ngFor="let item of cart; let i = index" [attr.data-index]="i">
-        {{ item.productName }} –
+        {{ item.productName | uppercase }} –
         <input
           #qty
           min="1"
@@ -45,10 +45,12 @@
           [value]="item.productQty"
           (change)="updateItem(+qty.value, item.productId)"
         />
-        units - {{ item.productPrice }} U$ – Total:
+        units - {{ item.productPrice | currency }} – Total:
         {{ item.productPrice * item.productQty }} U$ &nbsp;&nbsp;
         <a class="deleteBtn" (click)="deleteItem(item.productId)">X</a>
       </li>
     </ul>
   </div>
 </ng-container>
+
+<ng-template #loading>...loading</ng-template>

@@ -4,9 +4,6 @@ import { CartService } from './cart.service';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  template: `
-    
-  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
@@ -22,7 +19,6 @@ export class AppComponent {
     return this.cartService.addItem(product);
   }
 
-  // fixme:
   updateItem(qty: number, productId: number) {
     this.cartService.updateItem(qty, productId);
   }

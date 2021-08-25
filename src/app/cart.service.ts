@@ -1,8 +1,14 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { distinctUntilChanged, find, map } from 'rxjs/operators';
+import {
+  debounceTime,
+  distinctUntilChanged,
+  find,
+  map,
+  tap,
+} from 'rxjs/operators';
 
-interface ICart {
+export interface ICart {
   productId: number;
   productName: string;
   productPrice: number;
@@ -16,12 +22,18 @@ const initialState: ICart[] = [
     productPrice: 12,
     productQty: 1,
   },
+  {
+    productId: 2,
+    productName: 'Frijoles',
+    productPrice: 25,
+    productQty: 2,
+  },
 ];
 
 @Injectable()
 export class CartService {
   private subject = new BehaviorSubject<ICart[]>(initialState);
-  private store$ = this.subject.asObservable().pipe(distinctUntilChanged());
+  private store$ = this.subject.asObservable();
 
   getCart() {
     return this.store$;
@@ -32,8 +44,9 @@ export class CartService {
     const productIndex = products.findIndex(
       (x) => x.productId === item.productId
     );
+    const productExist = productIndex !== -1;
 
-    if (productIndex !== -1) {
+    if (productExist) {
       products[productIndex].productQty++;
       this.subject.next(products);
       return;
@@ -51,8 +64,9 @@ export class CartService {
   updateItem(qty: number, productId: number) {
     const products = this.subject.value;
     const productIndex = products.findIndex((x) => x.productId === productId);
+    const productExist = productIndex !== -1;
 
-    if (productIndex !== -1) {
+    if (productExist) {
       products[productIndex].productQty = qty;
     }
     return;
